@@ -150,7 +150,7 @@ def escape_percent(pattern):
     return pattern
 
 def failure(r, msg):
-    print("ERROR: %s: %s" % (r, msg), file=sys.stderr)
+    print("ERROR: %s: %s" % (os.waitstatus_to_exitcode(r), msg), file=sys.stderr)
 
 def make_torrent(opts, target):
     if opts.verbose:
@@ -229,7 +229,8 @@ def setup_parser():
     return p
 
 def system(cmd):
-    return os.system(cmd)
+    p = os.popen(cmd)
+    return p.close()
 
 def transcode(f, flacdir, mp3_dir, codec, opts, lock):
     tags = {}
