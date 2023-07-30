@@ -276,7 +276,6 @@ def transcode(f, flacdir, mp3_dir, codec, opts, lock):
     if opts.verbose:
         print(flac_cmd)
     r = system(flac_cmd)
-    print(r.read())
     if r:
         failure(r, "error encoding %s" % outname)
         system("touch '%s/FAILURE'" % mp3_dir)
