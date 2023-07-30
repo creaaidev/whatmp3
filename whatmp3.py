@@ -169,19 +169,19 @@ def make_torrent(opts, target):
     if opts.verbose:
         print(torrent_cmd)
     r = system(torrent_cmd)
-    if r: failure(r, torrent_cmd)
+    if r.returncode: failure(r, torrent_cmd)
 
 def replaygain(opts, codec, outdir):
     if opts.verbose:
         print("APPLYING replaygain")
         print(encoders[enc_opts[codec]['enc']]['regain'] % outdir)
     r = system(encoders[enc_opts[codec]['enc']]['regain'] % escape_quote(outdir))
-    if r: failure(r, "replaygain")
+    if r.returncode: failure(r, "replaygain")
     for dirpath, dirs, files in os.walk(outdir, topdown=False):
         for name in dirs:
             r = system(encoders[enc_opts[codec]['enc']]['regain']
                        % os.path.join(dirpath, name))
-            if r: failure(r, "replaygain")
+            if r.returncode: failure(r, "replaygain")
 
 def setup_parser():
     p = argparse.ArgumentParser(
@@ -229,7 +229,7 @@ def setup_parser():
     return p
 
 def system(cmd):
-    return os.system(cmd)
+    return os.popen(cmd)
 
 def transcode(f, flacdir, mp3_dir, codec, opts, lock):
     tags = {}
@@ -275,7 +275,8 @@ def transcode(f, flacdir, mp3_dir, codec, opts, lock):
     if opts.verbose:
         print(flac_cmd)
     r = system(flac_cmd)
-    if r:
+    print(r.read())
+    if r.returncode:
         failure(r, "error encoding %s" % outname)
         system("touch '%s/FAILURE'" % mp3_dir)
     return 0
